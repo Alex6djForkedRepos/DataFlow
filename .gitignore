@@ -56,3 +56,6 @@ employees.json
 products.json
 *.test.csv
 *.test.json
+
+# MSBuild diagnostic output
+preprocessed.xml

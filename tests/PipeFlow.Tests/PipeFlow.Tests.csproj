@@ -3,7 +3,26 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <UseAppHost>false</UseAppHost>
+    <!-- Single-target net10.0: only net10.0 apphost is available in this environment.   -->
+    <!-- The library under test still multi-targets (net8.0 + net10.0).                  -->
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- xUnit v3 in VSTest mode (default).                                                -->
+    <!-- GenerateTestingPlatformEntryPoint=false prevents Microsoft.Testing.Platform.MSBuild -->
+    <!-- from generating a TestPlatformEntryPoint.cs that conflicts with xunit's entry     -->
+    <!-- point. This is needed because MTP MSBuild is a transitive dependency.             -->
+    <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
+    <!-- Microsoft.NET.Test.Sdk adds GenerateProgramFile as an InitialTarget which overrides -->
+    <!-- xunit.v3.core.props' false setting. Explicitly set false in the project file to  -->
+    <!-- ensure it wins (project properties evaluate after package props).                -->
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <!-- NixOS/mise: ResolvedAppHostPack is empty, so AppHostSourcePath/_IntermediatePath  -->
+    <!-- must be set explicitly. AppHostIntermediatePath is normally set inside the        -->
+    <!-- _GetAppHostPaths target but only when ResolvedAppHostPack is resolved.            -->
+    <AppHostSourcePath>$(DOTNET_ROOT)/packs/Microsoft.NETCore.App.Host.linux-x64/10.0.0/runtimes/linux-x64/native/apphost</AppHostSourcePath>
+    <AppHostIntermediatePath>$(MSBuildProjectDirectory)/obj/$(Configuration)/$(TargetFramework)/apphost</AppHostIntermediatePath>
+    <!-- CA1707: underscore-separated test names (Arrange_Act_Assert) are xUnit convention. -->
+    <!-- CA2263: .Be(typeof(T)) is idiomatic in FluentAssertions type-hierarchy tests.     -->
+    <NoWarn>$(NoWarn);CA1707;CA2263</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +32,14 @@
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="coverlet.collector" />
   </ItemGroup>
+
+  <!-- xunit.runner.visualstudio 3.0.0 props defines these as None items but they are   -->
+  <!-- not copied to output on NixOS/mise environments. Re-declare them explicitly.      -->
+  <Target Name="_EnsureXunitAdapterCopied" BeforeTargets="Build">
+    <Copy SourceFiles="$(NuGetPackageRoot)xunit.runner.visualstudio/3.0.0/build/net6.0/xunit.runner.visualstudio.testadapter.dll"
+          DestinationFolder="$(OutputPath)"
+          SkipUnchangedFiles="true" />
+  </Target>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PipeFlow\PipeFlow.csproj" />
