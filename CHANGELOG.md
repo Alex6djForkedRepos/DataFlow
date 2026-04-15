@@ -4,15 +4,21 @@ All notable changes to PipeFlow will be documented in this file.
 
 ## [Unreleased]
 
-### Wave 0.A -- Foundation
+### Wave 0.A - Foundation  Complete
 
-- Archive v2.1.0 as git tag `v2.1.0-archived`
-- Reorganize repository into SLNX solution + Central Package Management + shared MSBuild props
-- Multi-target `net8.0` and `net10.0`
-- Introduce core abstractions: `IPipelineSource<T>`, `IPipelineSink<T>`, `IPipeline<T>`, `IOrderedPipeline<T>`, `IQueryablePipeline<T>`, `IOrderedQueryablePipeline<T>`
-- Redesign `DataRow` with structural `IEquatable<DataRow>` + `GetHashCode` caching
-- Structured exception hierarchy: `PipeFlowException`, `PipeFlowSourceException`, `PipeFlowSinkException`, `PipeFlowConfigurationException`, `PipeFlowValidationException`
-- GitHub Actions `build.yml` rewritten with NuGet cache, xUnit v3, and coverage artifacts
+- [x] Archive v2.1.0 as git tag `v2.1.0-archived`
+- [x] Delete v2 code from working tree
+- [x] Repository restructure: SLNX + Central Package Management + `Directory.Build.props`
+- [x] Multi-target `net8.0` and `net10.0`
+- [x] Core abstractions: `IPipelineSource<T>`, `IPipelineSink<T>`, `IPipeline<T>`, `IOrderedPipeline<T>`, `IQueryablePipeline<T>`, `IOrderedQueryablePipeline<T>`
+- [x] `DataRow` with `IEquatable<DataRow>`, cached `GetHashCode`, null-friendly indexer, `InvariantCulture` type conversion (incl. `Nullable<T>` unwrap)
+- [x] Structured exception hierarchy
+- [x] `PipelineContext` (public readonly record struct) with Logger/Options/HTTP/CT/Services
+- [x] GitHub Actions `build.yml`: ubuntu/windows/macos × net8/net10 matrix with NuGet cache
+- [x] v2 `release.yml` and `dependency-check.yml` disabled pending Wave 4 rewrite
+- **61 tests green**
+
+**Next: Wave 0.B - Pipeline Implementation** (Pipeline<T>, ParallelPipeline<T>, Builder, DI, Options)
 
 ## [2.1.0] -- 2024-01-14
 
