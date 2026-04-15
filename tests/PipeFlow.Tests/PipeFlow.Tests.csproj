@@ -7,7 +7,9 @@
     <GenerateProgramFile>false</GenerateProgramFile>
     <!-- CA1707: underscore-separated test names (Arrange_Act_Assert) are xUnit convention. -->
     <!-- CA2263: .Be(typeof(T)) is idiomatic in FluentAssertions type-hierarchy tests. -->
-    <NoWarn>$(NoWarn);CA1707;CA2263</NoWarn>
+    <!-- NETSDK1188: Microsoft.TestPlatform.TestHost 17.11.1 ships resources with locale -->
+    <!-- codes unrecognised by .NET (zh-hans, pt-br, etc.); upstream package issue.      -->
+    <NoWarn>$(NoWarn);CA1707;CA2263;NETSDK1188</NoWarn>
   </PropertyGroup>
 
   <!-- =========================================================================== -->

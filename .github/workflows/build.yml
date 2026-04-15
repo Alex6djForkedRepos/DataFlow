@@ -56,6 +56,9 @@ jobs:
       - name: Test
         run: dotnet test -c Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory TestResults/
 
+      - name: Run sandbox scenarios
+        run: dotnet run --project samples/PipeFlow.Sandbox -c Release --no-build
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
