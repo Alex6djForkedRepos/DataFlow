@@ -65,3 +65,10 @@ dotnet_naming_style.underscore_camel.capitalization = camel_case
 # Code quality analyzers
 dotnet_diagnostic.CA1014.severity = none  # CLSCompliant attribute (not needed)
 dotnet_diagnostic.CA2007.severity = none  # ConfigureAwait (library code, handled case by case)
+
+[tests/**/*.cs]
+# CA1515: test classes must be public for xUnit discovery - suppress the
+#         "can be internal" suggestion so dotnet format doesn't flip visibility.
+# CA1812: test classes look uninstantiated to analyzers but xUnit instantiates them.
+dotnet_diagnostic.CA1515.severity = none
+dotnet_diagnostic.CA1812.severity = none
