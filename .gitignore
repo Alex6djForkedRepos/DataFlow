@@ -19,6 +19,10 @@ coverage/
 *.suo
 *.userosscache
 
+# Editor harness / AI assistant caches
+.claude/
+.claire/
+
 # NuGet
 *.nupkg
 *.snupkg

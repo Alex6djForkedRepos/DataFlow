@@ -8,10 +8,6 @@
   <Folder Name="/samples/">
     <Project Path="samples/PipeFlow.Sandbox/PipeFlow.Sandbox.csproj" />
   </Folder>
-  <Folder Name="/docs/">
-    <File Path="docs/superpowers/specs/2026-04-15-pipeflow-v3-architecture-design.md" />
-    <File Path="docs/superpowers/plans/2026-04-15-v3-wave0a-foundation.md" />
-  </Folder>
   <Folder Name="/_config/">
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
