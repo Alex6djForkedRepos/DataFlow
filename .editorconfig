@@ -63,5 +63,5 @@ dotnet_naming_style.underscore_camel.required_prefix = _
 dotnet_naming_style.underscore_camel.capitalization = camel_case
 
 # Code quality analyzers
-dotnet_diagnostic.CA1014.severity = none
-dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.CA1014.severity = none  # CLSCompliant attribute (not needed)
+dotnet_diagnostic.CA2007.severity = none  # ConfigureAwait (library code, handled case by case)

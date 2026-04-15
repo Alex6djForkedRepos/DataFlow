@@ -15,7 +15,7 @@
     <AnalysisMode>All</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <NoWarn>$(NoWarn);CS1591</NoWarn> <!-- Missing XML doc (temporarily) -->
   </PropertyGroup>
 
   <PropertyGroup Label="Deterministic + SourceLink" Condition="'$(CI)' == 'true'">
