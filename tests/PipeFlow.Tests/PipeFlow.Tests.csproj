@@ -3,26 +3,48 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <!-- Single-target net10.0: only net10.0 apphost is available in this environment.   -->
-    <!-- The library under test still multi-targets (net8.0 + net10.0).                  -->
-    <TargetFramework>net10.0</TargetFramework>
-    <!-- xUnit v3 in VSTest mode (default).                                                -->
-    <!-- GenerateTestingPlatformEntryPoint=false prevents Microsoft.Testing.Platform.MSBuild -->
-    <!-- from generating a TestPlatformEntryPoint.cs that conflicts with xunit's entry     -->
-    <!-- point. This is needed because MTP MSBuild is a transitive dependency.             -->
-    <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
-    <!-- Microsoft.NET.Test.Sdk adds GenerateProgramFile as an InitialTarget which overrides -->
-    <!-- xunit.v3.core.props' false setting. Explicitly set false in the project file to  -->
-    <!-- ensure it wins (project properties evaluate after package props).                -->
+    <!-- xUnit v3 in VSTest mode: prevents auto-generated Program.cs that conflicts with xUnit's entry point. -->
     <GenerateProgramFile>false</GenerateProgramFile>
-    <!-- NixOS/mise: ResolvedAppHostPack is empty, so AppHostSourcePath/_IntermediatePath  -->
-    <!-- must be set explicitly. AppHostIntermediatePath is normally set inside the        -->
-    <!-- _GetAppHostPaths target but only when ResolvedAppHostPack is resolved.            -->
+    <!-- CA1707: underscore-separated test names (Arrange_Act_Assert) are xUnit convention. -->
+    <!-- CA2263: .Be(typeof(T)) is idiomatic in FluentAssertions type-hierarchy tests. -->
+    <NoWarn>$(NoWarn);CA1707;CA2263</NoWarn>
+  </PropertyGroup>
+
+  <!-- =========================================================================== -->
+  <!-- Local dev environment detection (mise / NixOS / custom DOTNET_ROOT layouts)  -->
+  <!--                                                                              -->
+  <!-- Some local environments install only the net10.0 runtime + linux-x64         -->
+  <!-- apphost pack, and MSBuild's automatic ResolvedAppHostPack lookup fails,      -->
+  <!-- leaving AppHostIntermediatePath/SourcePath unset so `Build` fails with       -->
+  <!-- "Could not copy apphost because it was not found".                           -->
+  <!--                                                                              -->
+  <!-- When we detect this specific environment shape - Unix + net10.0 apphost      -->
+  <!-- pack present + no net8.0 runtime installed - we:                             -->
+  <!--   1. Single-target net10.0 (no net8 runtime available to host tests).        -->
+  <!--   2. Explicitly point AppHostSourcePath at the mise-resolved apphost.        -->
+  <!--   3. Disable the Microsoft.Testing.Platform entry-point generation           -->
+  <!--      (the MTP MSBuild props are a transitive dep that collides with xUnit).  -->
+  <!--                                                                              -->
+  <!-- On CI (ubuntu-latest/windows-latest/macos-latest with actions/setup-dotnet)   -->
+  <!-- the apphost pack version is a newer 10.0.x patch, so !Exists('10.0.0') and   -->
+  <!-- the net8.0 runtime IS installed, so this block is skipped and MSBuild's      -->
+  <!-- normal multi-target pipeline runs - both TFMs build and test normally.       -->
+  <!-- =========================================================================== -->
+  <PropertyGroup Condition=" '$(OS)' == 'Unix'
+                          and Exists('$(DOTNET_ROOT)/packs/Microsoft.NETCore.App.Host.linux-x64/10.0.0')
+                          and !Exists('$(DOTNET_ROOT)/shared/Microsoft.NETCore.App/8.0.0')
+                          and !Exists('$(DOTNET_ROOT)/shared/Microsoft.NETCore.App/8.0.1')
+                          and !Exists('$(DOTNET_ROOT)/shared/Microsoft.NETCore.App/8.0.2')
+                          and !Exists('$(DOTNET_ROOT)/shared/Microsoft.NETCore.App/8.0.3')
+                          and !Exists('$(DOTNET_ROOT)/shared/Microsoft.NETCore.App/8.0.10')
+                          and !Exists('$(DOTNET_ROOT)/shared/Microsoft.NETCore.App/8.0.11')
+                          and !Exists('$(DOTNET_ROOT)/shared/Microsoft.NETCore.App/8.0.12') ">
+    <TargetFrameworks></TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
+    <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
     <AppHostSourcePath>$(DOTNET_ROOT)/packs/Microsoft.NETCore.App.Host.linux-x64/10.0.0/runtimes/linux-x64/native/apphost</AppHostSourcePath>
     <AppHostIntermediatePath>$(MSBuildProjectDirectory)/obj/$(Configuration)/$(TargetFramework)/apphost</AppHostIntermediatePath>
-    <!-- CA1707: underscore-separated test names (Arrange_Act_Assert) are xUnit convention. -->
-    <!-- CA2263: .Be(typeof(T)) is idiomatic in FluentAssertions type-hierarchy tests.     -->
-    <NoWarn>$(NoWarn);CA1707;CA2263</NoWarn>
+    <PipeFlowLocalDevEnv>true</PipeFlowLocalDevEnv>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,9 +55,9 @@
     <PackageReference Include="coverlet.collector" />
   </ItemGroup>
 
-  <!-- xunit.runner.visualstudio 3.0.0 props defines these as None items but they are   -->
-  <!-- not copied to output on NixOS/mise environments. Re-declare them explicitly.      -->
-  <Target Name="_EnsureXunitAdapterCopied" BeforeTargets="Build">
+  <!-- Only applied on mise/NixOS: xunit.runner.visualstudio's testadapter.dll isn't       -->
+  <!-- copied to output there. On CI this copy is a no-op (SkipUnchangedFiles).             -->
+  <Target Name="_EnsureXunitAdapterCopied" BeforeTargets="Build" Condition="'$(PipeFlowLocalDevEnv)' == 'true'">
     <Copy SourceFiles="$(NuGetPackageRoot)xunit.runner.visualstudio/3.0.0/build/net6.0/xunit.runner.visualstudio.testadapter.dll"
           DestinationFolder="$(OutputPath)"
           SkipUnchangedFiles="true" />
