@@ -16,7 +16,8 @@ All notable changes to PipeFlow will be documented in this file.
 - [x] `PipelineContext` (public readonly record struct) with Logger/Options/HTTP/CT/Services
 - [x] GitHub Actions `build.yml`: ubuntu/windows/macos × net8/net10 matrix with NuGet cache
 - [x] v2 `release.yml` and `dependency-check.yml` disabled pending Wave 4 rewrite
-- **61 tests green**
+- [x] `samples/PipeFlow.Sandbox` integration smoke test: 70 end-to-end scenarios exercising every public API (DataRow mechanics, Nullable<T>/culture conversion, structural equality in LINQ/HashSet/Dictionary usage, Clone independence, exception catch patterns, IPipelineSource/Sink stub implementations with variance + cancellation, PipelineContext construction + `with` expressions, edge cases)
+- **61 unit tests green + 70 sandbox scenarios green**
 
 **Next: Wave 0.B - Pipeline Implementation** (Pipeline<T>, ParallelPipeline<T>, Builder, DI, Options)
 

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <!-- Sandbox uses the library via its public surface; test drive for real user flows.  -->
+    <!-- Relax analyzers for sample code: broad catches, simpler string APIs, etc.         -->
+    <!-- are idiomatic in illustrative samples.                                            -->
+    <AnalysisMode>Minimum</AnalysisMode>
+    <NoWarn>$(NoWarn);CA1031;CA1307;CA1849;CA1707;CA2263;CA1861;CA1822;CA1303;CA1852;CA1515;CA1812;CA1062</NoWarn>
+  </PropertyGroup>
+
+  <!-- Match test project's mise-compat conditional (see tests csproj for rationale) -->
+  <PropertyGroup Condition=" '$(OS)' == 'Unix'
+                          and Exists('$(DOTNET_ROOT)/packs/Microsoft.NETCore.App.Host.linux-x64/10.0.0')
+                          and !Exists('$(DOTNET_ROOT)/shared/Microsoft.NETCore.App/8.0.0') ">
+    <TargetFrameworks></TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
+    <AppHostSourcePath>$(DOTNET_ROOT)/packs/Microsoft.NETCore.App.Host.linux-x64/10.0.0/runtimes/linux-x64/native/apphost</AppHostSourcePath>
+    <AppHostIntermediatePath>$(MSBuildProjectDirectory)/obj/$(Configuration)/$(TargetFramework)/apphost</AppHostIntermediatePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PipeFlow\PipeFlow.csproj" />
+  </ItemGroup>
+
+</Project>
