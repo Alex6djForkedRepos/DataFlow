@@ -2,42 +2,18 @@
 
 All notable changes to PipeFlow will be documented in this file.
 
-## [2.1.0] - 2024-01-14
+## [Unreleased]
 
-### Added
-- PostgreSQL support with reader and writer classes
-- Bulk insert operations for PostgreSQL
-- Upsert support with ON CONFLICT handling
-- Async PostgreSQL operations
+### Wave 0.A -- Foundation
 
-## [2.0.0] - 2024-01-14
+- Archive v2.1.0 as git tag `v2.1.0-archived`
+- Reorganize repository into SLNX solution + Central Package Management + shared MSBuild props
+- Multi-target `net8.0` and `net10.0`
+- Introduce core abstractions: `IPipelineSource<T>`, `IPipelineSink<T>`, `IPipeline<T>`, `IOrderedPipeline<T>`, `IQueryablePipeline<T>`, `IOrderedQueryablePipeline<T>`
+- Redesign `DataRow` with structural `IEquatable<DataRow>` + `GetHashCode` caching
+- Structured exception hierarchy: `PipeFlowException`, `PipeFlowSourceException`, `PipeFlowSinkException`, `PipeFlowConfigurationException`, `PipeFlowValidationException`
+- GitHub Actions `build.yml` rewritten with NuGet cache, xUnit v3, and coverage artifacts
 
-### Added
-- Builder pattern with lazy execution
-- Full async/await support with CancellationToken
-- Entity Framework Core integration
-- IQueryable support with automatic paging
-- Consistent From/To API naming pattern
-- Streaming support for large datasets
-- PipelineResult class with execution metrics
-- Parallel processing improvements
+## [2.1.0] -- 2024-01-14
 
-### Changed
-- API now uses builder pattern instead of static methods
-- All I/O operations now have async versions
-- Renamed WriteToXxx methods to ToXxx for consistency
-- Improved memory efficiency with streaming
-
-### Fixed
-- Memory usage issues with large datasets
-- Performance bottlenecks in parallel processing
-
-## [1.0.0] - 2023-12-01
-
-### Added
-- Initial release
-- Support for CSV, JSON, Excel, SQL Server, MongoDB
-- Basic pipeline operations (Filter, Map, GroupBy)
-- Cloud storage support (AWS S3, Azure Blob, Google Cloud Storage)
-- REST API integration
-- Data validation framework
+(see tag v2.1.0-archived)
