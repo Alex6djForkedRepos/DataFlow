@@ -1,56 +1,84 @@
-name: Build and Test
+name: Build & Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main]
     paths-ignore:
       - '**.md'
+      - 'docs/**'
       - 'LICENSE'
-      - '.gitignore'
   pull_request:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - '.gitignore'
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  DOTNET_VERSION: '9.0.x'
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    name: Build on ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        configuration: [Debug, Release]
-    
-    name: Build on ${{ matrix.os }} - ${{ matrix.configuration }}
-    
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-    
-    - name: Restore dependencies
-      run: dotnet restore
-    
-    - name: Build
-      run: dotnet build --configuration ${{ matrix.configuration }} --no-restore
-    
-    - name: Test
-      run: dotnet test --configuration ${{ matrix.configuration }} --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
-    
-    - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && matrix.configuration == 'Release'
-      uses: codecov/codecov-action@v4
-      with:
-        files: ./coverage/**/coverage.cobertura.xml
-        fail_ci_if_error: false
-        verbose: true
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      - name: Tool restore
+        run: dotnet tool restore
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Verify formatting
+        run: dotnet format --verify-no-changes --severity warn
+        continue-on-error: true
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Test
+        run: dotnet test -c Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory TestResults/
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: TestResults/**/*.trx
+          retention-days: 7
+
+      - name: Coverage
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet test -c Release --no-build --collect:"XPlat Code Coverage" --results-directory coverage/
+
+      # NOTE: CODECOV_TOKEN secret is OPTIONAL. On a fresh repo before Codecov
+      # is wired up, this step emits a warning but does not fail the build
+      # (fail_ci_if_error: false). Once you add the secret via
+      # Settings > Secrets and variables > Actions, the warning goes away.
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/**/coverage.cobertura.xml
+          fail_ci_if_error: false
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

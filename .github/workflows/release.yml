@@ -1,15 +1,7 @@
-name: Release
+name: Release (DISABLED - will be rewritten in Wave 4)
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to release (e.g., 1.0.0)'
-        required: true
-        type: string
+  workflow_dispatch:  # manual only; no automatic triggers
 
 env:
   DOTNET_VERSION: '9.0.x'

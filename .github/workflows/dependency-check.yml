@@ -1,8 +1,6 @@
-name: Dependency Check
+name: Dependency Check (DISABLED - will be rewritten in Wave 4)
 
 on:
-  schedule:
-    - cron: '0 6 * * 1'  # Every Monday at 6 AM
   workflow_dispatch:
 
 env:
