@@ -1,0 +1,33 @@
+# Normalise line endings on checkin and checkout across platforms.
+# Prevents Windows runners (or dev machines) from introducing CRLF that
+# breaks .editorconfig's end_of_line=lf contract and `dotnet format`.
+* text=auto eol=lf
+
+# Explicit rules for source files we format and lint
+*.cs          text eol=lf diff=csharp
+*.csproj      text eol=lf
+*.props       text eol=lf
+*.targets     text eol=lf
+*.slnx        text eol=lf
+*.sln         text eol=lf
+*.editorconfig text eol=lf
+*.yml         text eol=lf
+*.yaml        text eol=lf
+*.json        text eol=lf
+*.md          text eol=lf
+*.sh          text eol=lf
+
+# Windows-only scripts get CRLF
+*.cmd         text eol=crlf
+*.bat         text eol=crlf
+*.ps1         text eol=crlf
+
+# Binary files
+*.png         binary
+*.jpg         binary
+*.gif         binary
+*.ico         binary
+*.pfx         binary
+*.snk         binary
+*.nupkg       binary
+*.snupkg      binary
